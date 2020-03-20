@@ -1,0 +1,29 @@
+---
+title: "report"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+
+library(EpiSoon)
+```
+
+## Scoring Rules
+
+### CRPS
+
+
+### LogS
+
+**Advantage**: logarithmic Score penalises underestimating uncertainty heavily. I feel this is what we want. 
+
+**Drawback**: In contrast to the CRPS, the computation of LogS requires a predictive density. An estimatorcan be obtained with classical nonparametric kernel density estimation (KDE, e.g. Silverman1986). However, this estimator is valid only under stringent theoretical assumptions and canbe fragile in practice: If the outcome falls into the tails of the simulated forecast distribution,the estimated score may be highly sensitive to the choice of the bandwidth tuning parameter.In an MCMC context, a mixture-of-parameters estimator that utilizes a simulated sampleof parameter draws rather than draws from the posterior predictive distribution is a better
+
+--> especially problematic I think if we work with traces and only small sample sizes?
+
+**Question** do we now the posterior distribution of our draws?
+
+### DSS
+
