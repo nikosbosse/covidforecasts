@@ -6,14 +6,22 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
-
 library(EpiSoon)
+evaluations <- readRDS("forecast_evaluation.rds")
+
 ```
 
-## Scoring Rules
+## Overview Scoring Rules {.tabset}
+
+
+### Bias
+should be around 0.5 (between -1 and 1 according to Gunnar, but that seems just wrong)
+
+### Sharpness
+smaller is better. 
 
 ### CRPS
-
+generalisation of Brier score to continuous variables. Smaller is better. 
 
 ### LogS
 
@@ -26,4 +34,99 @@ library(EpiSoon)
 **Question** do we now the posterior distribution of our draws?
 
 ### DSS
+
+
+
+## Performance over time horizons {.tabset}
+
+```{r horizons, include=FALSE}
+horizon <- summarise_scores(evaluations$scores, variables = "horizon")
+
+```
+
+### 1 day ahead {.tabset}
+
+#### Predictions
+![1 day ahead prediction](results/plots/forecasts_one_ahead_all_regions.png)
+
+#### Scoring
+
+##### **Conclusion**
+Across the bench, Sparse AR seems the most reasonable (little bias, ok DSS and LogS)
+
+
+AR1 seems to be very unconfident (and therefore performs well on LogS)
+AR1 seems to be downward biased. 
+
+
+![1 day ahead metrics](results/plots/metrics_one_ahead_across_regions.png)
+
+
+```{r horizon-1, echo=FALSE}
+horizon %>% dplyr::filter(horizon == 1) %>% knitr::kable(booktabs = TRUE)
+
+```
+
+
+
+### 3 day ahead {.tabset}
+
+#### Predictions
+![3 day ahead prediction](results/plots/forecasts_three_ahead_all_regions.png)
+
+#### Scoring
+
+##### **Conclusion**
+AR1 seems very bad in terms of bias and everything. 
+
+Sparse AR is the best in terms of crps, AR1 the worst. 
+Sparse AR also best with dss
+
+--> take Sparse AR
+
+All models have a tendency to be downwards biased, the local and semilocal ones tend to do a bit better. 
+
+
+
+![3 day ahead metrics](results/plots/metrics_three_ahead_across_regions.png)
+
+
+```{r horizon-3, echo=FALSE}
+horizon %>% dplyr::filter(horizon == 7) %>% knitr::kable(booktabs = TRUE)
+
+```
+
+
+
+### 7 days ahead {.tabset}
+
+
+#### Predictions
+![7 day ahead prediction](results/plots/forecasts_seven_ahead_all_regions.png)
+
+#### Scoring 
+
+##### **Conclusion**
+Sparse AR still downwards biased
+local and semilocal doing better
+
+crps: student local is best (it shouldn't?), Semilocal and Sparse AR about equal. Sparse AR most consistent. 
+
+dss: student local doing best, then Sparse AR and semilocal
+
+LogS: student local best, then Sparse AR wide ahead of the others. 
+
+Sparse AR most consistent. 
+
+![3 day ahead metrics](results/plots/metrics_three_ahead_across_regions.png)
+
+
+```{r horizon-7, echo=FALSE}
+horizon %>% dplyr::filter(horizon == 3) %>% knitr::kable(booktabs = TRUE)
+
+```
+
+
+
+
 
