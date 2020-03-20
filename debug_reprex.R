@@ -1,7 +1,7 @@
 library(EpiSoon)
 
-n_tries <- 20
-obs <- readRDS("rts_netherlands.rds")
+n_tries <- 100
+obs <- readRDS("rts_spain.rds")
 obs
 
 models <- list("Sparse AR" = function(ss, y){bsts::AddAutoAr(ss, y = y, lags = 7)},
