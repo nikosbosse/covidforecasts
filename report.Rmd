@@ -7,7 +7,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 
 library(EpiSoon)
-evaluations <- readRDS("forecast_evaluation.rds")
+evaluations <- readRDS("forecast_evaluation_21.rds")
 
 ```
 
@@ -37,42 +37,89 @@ generalisation of Brier score to continuous variables. Smaller is better.
 
 
 
-## Performance over time horizons {.tabset}
+## Predictions over time horizons {.tabset}
+### 1 day ahead 
+![1 day ahead prediction](results/plots/forecasts_1_ahead_all_regions.png)
 
+### 3 days ahead 
+![3 day ahead prediction](results/plots/forecasts_3_ahead_all_regions.png)
+
+### 7 days ahead 
+![7 day ahead prediction](results/plots/forecasts_7_ahead_all_regions.png)
+
+### 14 days ahead 
+![14 day ahead prediction](results/plots/forecasts_14_ahead_all_regions.png)
+
+### 21 days ahead 
+![21 day ahead prediction](results/plots/forecasts_21_ahead_all_regions.png)
+
+## Scoring by metrics {.tabset}
+
+### Bias
+![median Bias across time](results/plots/bias_median_across_regions_all_horizons.png)
+
+![Bias across different time horizons](results/plots/biasacross_regions_all_horizons.png)
+
+![Bias across different time horizons](results/plots/biasBias_violin_across_regions_different_horizons.png)
+
+
+###  CRPS
+![median CRPS across time](results/plots/crps_median_across_regions_all_horizons.png)
+
+![CRPS across different time horizons](results/plots/crpsacross_regions_all_horizons.png)
+
+### logS
+![median LogS across time](results/plots/logs_median_across_regions_all_horizons.png)
+
+![LogS across different time horizons](results/plots/logsacross_regions_all_horizons.png)
+
+### DSS
+![median DSS across time](results/plots/dss_median_across_regions_all_horizons.png)
+
+![DSS across different time horizons](results/plots/dssacross_regions_all_horizons.png)
+
+### Sharpness
+![median Sharpness across time](results/plots/sharpness_median_across_regions_all_horizons.png)
+
+![Sharpness across different time horizons](results/plots/sharpnessacross_regions_all_horizons.png)
+
+
+## Scoring by days {.tabset}
 ```{r horizons, include=FALSE}
-horizon <- summarise_scores(evaluations$scores, variables = "horizon")
+score_by_days <- summarise_scores(evaluations$scores, variables = "horizon")
 
 ```
 
-### 1 day ahead {.tabset}
-
-#### Predictions
-![1 day ahead prediction](results/plots/forecasts_one_ahead_all_regions.png)
-
-#### Scoring
+### 1 day ahead
 
 ##### **Conclusion**
 Across the bench, Sparse AR seems the most reasonable (little bias, ok DSS and LogS)
-
 
 AR1 seems to be very unconfident (and therefore performs well on LogS)
 AR1 seems to be downward biased. 
 
 
-![1 day ahead metrics](results/plots/metrics_one_ahead_across_regions.png)
+
+![Bias across models 1 day ahead](results/plots/bias_across_regions_1_day_ahead_forecasts.png)
+
+![CRPS across models 1 day ahead](results/plots/crps_across_regions_1_day_ahead_forecasts.png)
+
+![LogS across models 1 day ahead](results/plots/logs_across_regions_1_day_ahead_forecasts.png)
+
+![DSS across models 1 day ahead](results/plots/dss_across_regions_1_day_ahead_forecasts.png)
+
+![Sharpness across models 1 day ahead](results/plots/sharpness_across_regions_1_day_ahead_forecasts.png)
+
 
 
 ```{r horizon-1, echo=FALSE}
-horizon %>% dplyr::filter(horizon == 1) %>% knitr::kable(booktabs = TRUE)
+score_by_days %>% dplyr::filter(horizon == 1) %>% 
+  knitr::kable(booktabs = TRUE, linesep = c("", "", "", "\\hline"))
 
 ```
 
 
-
-### 3 day ahead {.tabset}
-
-#### Predictions
-![3 day ahead prediction](results/plots/forecasts_three_ahead_all_regions.png)
+### 3 day ahead 
 
 #### Scoring
 
@@ -86,47 +133,97 @@ Sparse AR also best with dss
 
 All models have a tendency to be downwards biased, the local and semilocal ones tend to do a bit better. 
 
+``` {r, echo = F, eval = F}
+horizon <- 3
+metrics <- c("bias", "crps", "logs", "dss", "sharpness")
+for (metric in metrics) {
+  
+  file <- paste("results/plots/", metric, "bias", "_across_regions_", horizon, 
+                 "_day_ahead_forecasts.png", sep = "")
 
+  cat("![Bias across model forecasts](", file, ")\n \n", sep = "")
+}
 
-![3 day ahead metrics](results/plots/metrics_three_ahead_across_regions.png)
+t <- horizon
+score_by_days %>% dplyr::filter(horizon == t) %>% 
+  knitr::kable(booktabs = TRUE, linesep = c("", "", "", "\\hline"))
+
+```
+
+![Bias across models 3 day ahead](results/plots/bias_across_regions_3_day_ahead_forecasts.png)
+
+![CRPS across models 3 day ahead](results/plots/crps_across_regions_3_day_ahead_forecasts.png)
+
+![LogS across models 3 day ahead](results/plots/logs_across_regions_3_day_ahead_forecasts.png)
+
+![DSS across models 3 day ahead](results/plots/dss_across_regions_3_day_ahead_forecasts.png)
+
+![Sharpness across models 3 day ahead](results/plots/sharpness_across_regions_3_day_ahead_forecasts.png)
+
 
 
 ```{r horizon-3, echo=FALSE}
-horizon %>% dplyr::filter(horizon == 7) %>% knitr::kable(booktabs = TRUE)
+score_by_days %>% dplyr::filter(horizon == 3) %>% 
+  knitr::kable(booktabs = TRUE, linesep = c("", "", "", "\\hline"))
+```
+
+
+### 7 days ahead 
+
+``` {r, echo = F, results = "asis"}
+horizon <- 7
+metrics <- c("bias", "crps", "logs", "dss", "sharpness")
+for (metric in metrics) {
+  
+  file <- paste("results/plots/", metric, "_across_regions_", horizon, 
+                 "_day_ahead_forecasts.png", sep = "")
+
+  cat("![Bias across model forecasts](", file, ")\n \n", sep = "")
+}
+
+t <- horizon
+score_by_days %>% dplyr::filter(horizon == t) %>% 
+  knitr::kable(booktabs = TRUE, linesep = c("", "", "", "\\hline"))
+
+```
+
+### 14 days ahead 
+
+``` {r, echo = F, results = "asis"}
+horizon <- 14
+metrics <- c("bias", "crps", "logs", "dss", "sharpness")
+for (metric in metrics) {
+  
+  file <- paste("results/plots/", metric, "_across_regions_", horizon, 
+                 "_day_ahead_forecasts.png", sep = "")
+
+  cat("![Bias across model forecasts](", file, ")\n \n", sep = "")
+}
+
+t <- horizon
+score_by_days %>% dplyr::filter(horizon == t) %>% 
+  knitr::kable(booktabs = TRUE, linesep = c("", "", "", "\\hline"))
 
 ```
 
 
+### 21 days ahead
 
-### 7 days ahead {.tabset}
+``` {r, echo = F, results = "asis"}
+horizon <- 21
+metrics <- c("bias", "crps", "logs", "dss", "sharpness")
+for (metric in metrics) {
+  
+  file <- paste("results/plots/", metric, "_across_regions_", horizon, 
+                 "_day_ahead_forecasts.png", sep = "")
 
+  cat("![Bias across model forecasts](", file, ")\n \n", sep = "")
+}
 
-#### Predictions
-![7 day ahead prediction](results/plots/forecasts_seven_ahead_all_regions.png)
-
-#### Scoring 
-
-##### **Conclusion**
-Sparse AR still downwards biased
-local and semilocal doing better
-
-crps: student local is best (it shouldn't?), Semilocal and Sparse AR about equal. Sparse AR most consistent. 
-
-dss: student local doing best, then Sparse AR and semilocal
-
-LogS: student local best, then Sparse AR wide ahead of the others. 
-
-Sparse AR most consistent. 
-
-![3 day ahead metrics](results/plots/metrics_three_ahead_across_regions.png)
-
-
-```{r horizon-7, echo=FALSE}
-horizon %>% dplyr::filter(horizon == 3) %>% knitr::kable(booktabs = TRUE)
+t <- horizon
+score_by_days %>% dplyr::filter(horizon == t) %>% 
+  knitr::kable(booktabs = TRUE, linesep = c("", "", "", "\\hline"))
 
 ```
-
-
-
 
 
