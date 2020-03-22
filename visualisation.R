@@ -56,7 +56,7 @@ for (horizon in horizons) {
 
 
 #============================================================== # 
-# make scoring plots for different horizons
+# make scoring plots 
 # ============================================================= #
 
 # ============================================================= #
@@ -196,30 +196,77 @@ ggsave2(filename,
 
 
 
+#============================================================== # 
+# Look at correlation of scoring metrics 
+# ============================================================= #
+out <- list()
+for (t in horizons) {
+  correlation <- evaluations$scores %>% 
+    dplyr::filter(horizon == t) %>%
+    dplyr::select(metrics) %>% 
+    dplyr::mutate(bias = 0.5 - bias) %>% 
+    dplyr::filter_all(dplyr::all_vars(!is.infinite(.))) %>%
+    cor() 
+  
+  title <- paste("horizon =", t)
+  out[[as.character(t)]] <- ggplot(reshape2::melt(correlation), 
+                                   aes(Var1, Var2, fill=value)) +
+    geom_tile(height=0.8, width=0.8) +
+    scale_fill_gradient2(low="blue", mid="white", high="red") +
+    theme_minimal() +
+    coord_equal() +
+    labs(x="",y="",fill="Corr") +
+    theme(axis.text.x=element_text(size=11, angle=45, vjust=1, hjust=1, 
+                                   margin=margin(-3,0,0,0)),
+          axis.text.y=element_text(size=11, margin=margin(0,-3,0,0)),
+          panel.grid.major=element_blank()) +
+    theme(text = element_text(family = 'Sans Serif'),
+          legend.position = "bottom") +
+    ggtitle(title)
+}
+out <- patchwork::wrap_plots(out)
+
+filename <- paste("results/plots/correlation_metrics_different_horizons.png")
+ggsave2(filename,
+        plot = out, width = 15, height = 10)
 
 
 
 
+#============================================================== # 
+# Look at which countries perform good and bad
+# ============================================================= #
 
+metric = "crps"
+horizon = t = 1
 
+metrics <- c("crps", "logs", "dss")
+horizons <- c(1, 3, 7, 14, 21)
+scores <- summarise_scores(evaluations$scores, c("horizon", "region"))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+for (metric in metrics) {
+  for (t in horizons) {
+    test <- scores %>% 
+      dplyr::filter(horizon == t) %>% 
+      dplyr::filter(score == metric) %>% 
+      dplyr::select(-c(bottom, lower, mean, upper, top, sd, score)) %>%
+      dplyr::mutate(!!metric := median)
+    
+    out <- ggplot(test, aes(x = reorder(region, median), y = .data[[metric]], color = model)) + 
+      geom_point() + 
+      geom_line(aes(group = model)) + 
+      facet_grid(model ~ ., scales = "free") +  
+      theme(text = element_text(family = 'Sans Serif'),
+            legend.position = "bottom") + 
+      theme(axis.text.x = element_text(angle=90, hjust = 1, 
+                                       vjust = 0.5, margin = margin(5,0,0,0))) 
+    
+    filename <- paste("results/plots/regions_", metric, 
+                      "_", t, "_ahead.png", sep = "")
+    
+    ggsave(filename = filename, plot = out, width = 15, height = 10)
+  }
+}
 
 
 
