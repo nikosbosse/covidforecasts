@@ -1,6 +1,7 @@
 ---
 title: "Covid Forecast Model Selection"
-output: html_document
+output: md_document
+# output: html_document
 ---
 
 ```{r setup, include=FALSE}

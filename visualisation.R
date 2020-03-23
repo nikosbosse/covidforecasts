@@ -320,7 +320,10 @@ for (t in horizons) {
       geom_line(aes(y = value)) +
       facet_grid(metric ~ model, scales = "free") + 
       theme(text = element_text(family = 'Sans Serif'),
-            legend.position = "bottom")  
+            legend.position = "bottom") 
+    
+    # + 
+    #   scale_y_continuous(breaks = my_breaks)
     
   out <- patchwork::wrap_plots(out, out2, ncol = 1)
   filename <- paste("results/plots/tests/pred_", horizon, 
@@ -331,7 +334,7 @@ for (t in horizons) {
   }
 }
 
-
+my_breaks <- function(x) { if (max(x) > 10) seq(0, 10, 2) else seq(0, 1, 0.2) }
 
 
 
