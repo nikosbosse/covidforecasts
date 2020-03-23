@@ -17,7 +17,8 @@ evaluations <- readRDS("forecast_evaluation_21.rds")
 should be around 0.5 (between -1 and 1 according to Gunnar, but that seems just wrong)
 
 ### Sharpness
-smaller is better. 
+Median Absolute Deviation, i.e., the (lo-/hi-) median of the absolute deviations from the median. 
+Smaller is better. 
 
 ### CRPS
 generalisation of Brier score to continuous variables. Smaller is better. 
@@ -33,6 +34,7 @@ generalisation of Brier score to continuous variables. Smaller is better.
 **Question** do we now the posterior distribution of our draws?
 
 ### DSS
+proper scoring rule that only depends on the first two moments. Smaller is better. 
 
 
 
@@ -243,5 +245,24 @@ for (t in horizons) {
     cat("![](", file, ")\n \n", sep = "")
   }
 }
+```
+
+## Region performance vs metrics {.tabset}
+
+``` {r, echo = F, results = "asis"}
+
+files <- list.files("results/plots/tests/")
+
+titles <- files %>% 
+  stringr::str_remove(pattern = c("pred_1_")) %>%
+  stringr::str_remove(pattern = c("_vs_scores.png"))
+
+for (i in 1:length(files)) {
+  title <- paste("###", titles[i])
+  cat(title, "\n \n")
+  pic <- paste("![](results/plots/tests/", files[i], ")", sep = "")
+  cat(pic, "\n \n")
+}
+                      
 ```
 

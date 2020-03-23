@@ -270,6 +270,80 @@ for (metric in metrics) {
 
 
 
+#============================================================== # 
+# Look at scores vs predictions for each country
+# ============================================================= #
+
+scores <- summarise_scores(evaluations$scores, c("region", "horizon"))
+horizons <- c(1, 3, 7, 14, 21)
+
+for (t in horizons) {
+  
+  t = 7
+  for (r in regions) {
+    obs <- observations %>% 
+      dplyr::filter(region == r) 
+    max_date <- max(obs$date) 
+    
+    pred <- evaluations$forecasts %>% 
+      dplyr::filter(region == r) %>% 
+      dplyr::filter(date <= max_date)
+    
+    min_date <- pred %>% 
+      dplyr::filter(horizon == t) %>%
+      dplyr::select(date) %>%
+      unlist %>%
+      min() %>%
+      as.Date()
+  
+    obs <- obs %>% dplyr::filter(!(date <= min_date))
+    
+    if (max_date <= min_date) {next()}
+    
+    ## make prediction plot
+    out <- plot_forecast_evaluation(forecasts = pred, 
+                                    observations = obs, c(t)) +
+      ggplot2::facet_grid(~ model, scales = "free") +
+      cowplot::panel_border() + 
+      theme(text = element_text(family = 'Sans Serif'),
+            legend.position = "bottom")    
+    
+    ## make metric plot
+    tmp <- evaluations$scores %>% 
+      dplyr::filter(region == r) %>%
+      dplyr::filter(horizon == t) %>%
+      tidyr::pivot_longer(cols = c(dss, crps, logs, bias, sharpness), 
+                          names_to = "metric", 
+                          values_to = "value")
+      
+    out2 <- ggplot(tmp, aes(x = date, group = model, color = metric)) + 
+      geom_line(aes(y = value)) +
+      facet_grid(metric ~ model, scales = "free") + 
+      theme(text = element_text(family = 'Sans Serif'),
+            legend.position = "bottom")  
+    
+  out <- patchwork::wrap_plots(out, out2, ncol = 1)
+  filename <- paste("results/plots/tests/pred_", horizon, 
+                    "_", r, "_vs_scores.png", sep = "")
+  ggsave2(filename,
+          plot = out, width = 15,height = 15)
+  
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
