@@ -1,6 +1,7 @@
 ---
 title: "Covid Forecast Model Selection"
-output: md_document
+# output: md_document
+output: github_document
 # output: html_document
 ---
 
@@ -242,11 +243,9 @@ metrics <- c("crps", "logs", "dss")
 for (t in horizons) {
   title <- paste("### ", t, "day(s) ahead")
   cat(title, "\n \n")
-  for (metric in metrics) {
-    file <- paste("results/plots/regions_", metric, "_", t, 
+  file <- paste("results/plots/regions_all_metrics_", t, 
                  "_ahead.png", sep = "")
     cat("![](", file, ")\n \n", sep = "")
-  }
 }
 ```
 

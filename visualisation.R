@@ -110,6 +110,55 @@ for (horizon in horizons) {
 # ============================================================= #
 # metrics - one model all time points
 
+## violin plots
+horizons <- c(1,3,7,14,21)
+metrics <- c("bias", "crps", "logs", "dss", "sharpness")
+for (metric in metrics) {
+  eval_score <- evaluations$scores %>% 
+    dplyr::filter(metric == metric) %>%
+    dplyr::filter(horizon %in% horizons)
+  
+  for (metric in metrics) {
+    bound <- summarise_scores(eval_score) %>% 
+      dplyr::filter(score == metric) %>% dplyr::select(top) %>% 
+      unlist %>% min() * 1.3
+    
+    title <- paste(metric, "across all regions for", 
+                   horizon, "day ahead forecasts")
+    out <- ggplot(data = eval_score,
+                  aes(
+                    y = .data[[metric]],
+                    x = horizon,
+                    color = model
+                  )) +
+      geom_violin(aes(fill = model), alpha = 1, position = position_dodge(0.9)) +
+      theme(text = element_text(family = 'Sans Serif'),
+            legend.position = "bottom") +
+      ggtitle(title)
+    
+    if (metric == "bias") {
+      out <- out + 
+        ggplot2::geom_hline(yintercept = 0.5, linetype = "dashed")
+    } 
+    else {
+      if (metric == "logs") {bound <- min(bound, 10)}
+      out <- out +
+        ggplot2::coord_cartesian(ylim = c(NA, bound))
+    }
+    
+    
+    filename <- paste("results/plots/", metric, "_across_regions_", 
+                      horizon, "_day_ahead_forecasts", ".png", sep = "")
+    ggsave2(filename,
+            plot = out, width = 15)
+  }
+
+
+
+
+
+
+
 models <- unique(evaluations$scores$model)
 summarised_scores <- summarise_scores(evaluations$scores, 
                         "horizon")
@@ -244,29 +293,28 @@ metrics <- c("crps", "logs", "dss")
 horizons <- c(1, 3, 7, 14, 21)
 scores <- summarise_scores(evaluations$scores, c("horizon", "region"))
 
-for (metric in metrics) {
-  for (t in horizons) {
-    test <- scores %>% 
-      dplyr::filter(horizon == t) %>% 
-      dplyr::filter(score == metric) %>% 
-      dplyr::select(-c(bottom, lower, mean, upper, top, sd, score)) %>%
-      dplyr::mutate(!!metric := median)
-    
-    out <- ggplot(test, aes(x = reorder(region, median), y = .data[[metric]], color = model)) + 
-      geom_point() + 
-      geom_line(aes(group = model)) + 
-      facet_grid(model ~ ., scales = "free") +  
-      theme(text = element_text(family = 'Sans Serif'),
-            legend.position = "bottom") + 
-      theme(axis.text.x = element_text(angle=90, hjust = 1, 
-                                       vjust = 0.5, margin = margin(5,0,0,0))) 
-    
-    filename <- paste("results/plots/regions_", metric, 
-                      "_", t, "_ahead.png", sep = "")
-    
-    ggsave(filename = filename, plot = out, width = 15, height = 10)
-  }
+for (t in horizons) {
+  test <- scores %>% 
+    dplyr::filter(horizon == t) %>% 
+    dplyr::select(-c(bottom, lower, mean, upper, top, sd)) %>%
+    dplyr::mutate(!!metric := median) %>%
+    dplyr::filter(score %in% metrics)
+  
+  out <- ggplot(test, aes(x = reorder(region, median), y = .data[[metric]], color = model)) + 
+    geom_point() + 
+    geom_line(aes(group = model)) + 
+    facet_grid(score ~ ., scales = "free") +  
+    theme(text = element_text(family = 'Sans Serif'),
+          legend.position = "bottom") + 
+    theme(axis.text.x = element_text(angle=90, hjust = 1, 
+                                     vjust = 0.5, margin = margin(5,0,0,0))) 
+  
+  filename <- paste("results/plots/regions_all_metrics", 
+                    "_", t, "_ahead.png", sep = "")
+  
+  ggsave(filename = filename, plot = out, width = 15, height = 10)
 }
+
 
 
 

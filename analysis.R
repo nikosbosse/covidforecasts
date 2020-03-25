@@ -8,26 +8,41 @@ library(ggplot2)
 results_dir <- NULL
 date <- NULL
 
-data <- EpiSoon::get_timeseries(results_dir = results_dir, 
+results_dir <- "../epipredictr/data/results 16_03_2020/"
+date <- as.Date("2020-03-13")
+
+data <- EpiNow::get_timeseries(results_dir = results_dir, 
                         date = date)
 
 regions <- unique(data$rt$region)
 
-observations <- lapply(seq_along(regions),
-                       function (i) {
-                         data[[1]] %>% 
-                           dplyr::filter(region == regions[i]) %>%
-                           dplyr::select("median", "date") %>%
-                           dplyr::rename(rt = median)
-                       })
-names(observations) <- regions
+observations <- data$rt %>% 
+  dplyr::select("median", "date", "region") %>%
+  dplyr::rename(rt = median) %>%
+  dplyr::rename(timeseries = region) %>%
+  dplyr::mutate("sample" = 1)
+
+
+observations <- observations[1:100, ]
+
+
+# 
+# 
+# observations <- lapply(seq_along(regions),
+#                        function (i) {
+#                          data[[1]] %>% 
+#                            dplyr::filter(region == regions[i]) %>%
+#                            dplyr::select("median", "date") %>%
+#                            dplyr::rename(rt = median)
+#                        })
+# names(observations) <- regions
 
 
 ## delete regions with too few observations
 max_n_obs = 5
 check_n_obs <- lapply(observations, nrow)
 too_few <- (sapply(check_n_obs, function(x) { x < max_n_obs}))
-observations[] <- NULL
+observations[too_few] <- NULL
 
 models <- list("Sparse AR" = function(ss, y){bsts::AddAutoAr(ss, y = y, lags = 2)},
                "Semi-local linear trend" = function(ss, y){bsts::AddSemilocalLinearTrend(ss, y = y)}, 
@@ -41,7 +56,6 @@ forecast_eval <- compare_timeseries(observations, models,
                                     horizon = 7, samples = 50)
 
 saveRDS(forecast_eval, "forecast_evaluation.rds")
-
 
 
 
