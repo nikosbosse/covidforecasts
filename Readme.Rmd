@@ -72,16 +72,22 @@ proper scoring rule that only depends on the first two moments. Smaller is bette
 
 
 ###  CRPS
+![](results/plots/crps_violin_across_regions_.png)
+
 ![median CRPS across time](results/plots/crps_median_across_regions_all_horizons.png)
 
 ![CRPS across different time horizons](results/plots/crpsacross_regions_all_horizons.png)
 
 ### logS
+![](results/plots/logs_violin_across_regions_.png)
+
 ![median LogS across time](results/plots/logs_median_across_regions_all_horizons.png)
 
 ![LogS across different time horizons](results/plots/logsacross_regions_all_horizons.png)
 
 ### DSS
+![](results/plots/dss_violin_across_regions_.png)
+
 ![median DSS across time](results/plots/dss_median_across_regions_all_horizons.png)
 
 ![DSS across different time horizons](results/plots/dssacross_regions_all_horizons.png)

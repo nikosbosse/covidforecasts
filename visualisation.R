@@ -44,14 +44,14 @@ horizons <- c(1,3,7,14,21)
 for (horizon in horizons) {
   out <- plot_forecast_evaluation(forecasts = evaluations$forecasts, 
                                   observations = observations, c(horizon)) +
-    ggplot2::facet_grid(region ~ model, scales = "free") +
+    ggplot2::facet_wrap(region ~ model, scales = "free", ncol = 4) +
     cowplot::panel_border() + theme(text = element_text(family = 'Sans Serif'),
                                     legend.position = "bottom")
   
   filename <- paste("results/plots/forecasts_", horizon, 
                     "_ahead_all_regions.png", sep = "")
   ggsave2(filename,
-          plot = out, width = 15,height = 30)
+          plot = out, width = 20,height = 49)
 }
 
 
@@ -113,45 +113,46 @@ for (horizon in horizons) {
 ## violin plots
 horizons <- c(1,3,7,14,21)
 metrics <- c("bias", "crps", "logs", "dss", "sharpness")
+eval_score <- evaluations$scores %>%
+dplyr::filter(metric == metric) %>%
+dplyr::filter(horizon %in% horizons)
+
 for (metric in metrics) {
-  eval_score <- evaluations$scores %>% 
-    dplyr::filter(metric == metric) %>%
-    dplyr::filter(horizon %in% horizons)
+  bound <- summarise_scores(eval_score) %>% 
+    dplyr::filter(score == metric) %>% dplyr::select(top) %>% 
+    unlist %>% median() #* 1.3
   
-  for (metric in metrics) {
-    bound <- summarise_scores(eval_score) %>% 
-      dplyr::filter(score == metric) %>% dplyr::select(top) %>% 
-      unlist %>% min() * 1.3
-    
-    title <- paste(metric, "across all regions for", 
-                   horizon, "day ahead forecasts")
-    out <- ggplot(data = eval_score,
-                  aes(
-                    y = .data[[metric]],
-                    x = horizon,
-                    color = model
-                  )) +
-      geom_violin(aes(fill = model), alpha = 1, position = position_dodge(0.9)) +
-      theme(text = element_text(family = 'Sans Serif'),
-            legend.position = "bottom") +
-      ggtitle(title)
-    
-    if (metric == "bias") {
-      out <- out + 
-        ggplot2::geom_hline(yintercept = 0.5, linetype = "dashed")
-    } 
-    else {
-      if (metric == "logs") {bound <- min(bound, 10)}
-      out <- out +
-        ggplot2::coord_cartesian(ylim = c(NA, bound))
-    }
-    
-    
-    filename <- paste("results/plots/", metric, "_across_regions_", 
-                      horizon, "_day_ahead_forecasts", ".png", sep = "")
-    ggsave2(filename,
-            plot = out, width = 15)
+  title <- paste(metric, "across all regions for", 
+                 horizon, "day ahead forecasts")
+  out <- ggplot(data = eval_score,
+                aes(
+                  y = .data[[metric]],
+                  x = as.factor(horizon)
+                )) +
+    geom_violin(aes(fill = model), alpha = 1, 
+                position = position_dodge(0.9), 
+                draw_quantiles = c(0.25, 0.498, 0.5, 0.502, 0.75)) + 
+    cowplot::theme_cowplot() + 
+    theme(text = element_text(family = 'Sans Serif'),
+          legend.position = "bottom") +
+    ggtitle(title)
+  
+  if (metric == "bias") {
+    out <- out + 
+      ggplot2::geom_hline(yintercept = 0.5, linetype = "dashed")
+  } 
+  else {
+    if (metric == "logs") {bound <- min(bound, 10)}
+    out <- out +
+      ggplot2::coord_cartesian(ylim = c(NA, bound))
   }
+ 
+  
+  filename <- paste("results/plots/", metric, "_violin_across_regions_", 
+                    ".png", sep = "")
+  ggsave2(filename,
+          plot = out, width = 15)
+}
 
 
 
@@ -176,7 +177,7 @@ for (metric in metrics) {
     geom_line(aes(y = median)) +
     geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.5) +
     geom_ribbon(aes(ymin = bottom, ymax = top), alpha = 0.3) +
-    facet_grid(model ~ ., scales = "free") +
+    facet_wrap(model ~ ., scales = "free") +
     theme(text = element_text(family = 'Sans Serif'),
           legend.position = "bottom") +
     ggtitle(title)

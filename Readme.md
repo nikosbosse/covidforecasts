@@ -93,6 +93,8 @@ horizons](results/plots/biasBias_violin_across_regions_different_horizons.png)
 
 ### CRPS
 
+![](results/plots/crps_violin_across_regions_.png)
+
 ![median CRPS across
 time](results/plots/crps_median_across_regions_all_horizons.png)
 
@@ -101,6 +103,8 @@ horizons](results/plots/crpsacross_regions_all_horizons.png)
 
 ### logS
 
+![](results/plots/logs_violin_across_regions_.png)
+
 ![median LogS across
 time](results/plots/logs_median_across_regions_all_horizons.png)
 
@@ -108,6 +112,8 @@ time](results/plots/logs_median_across_regions_all_horizons.png)
 horizons](results/plots/logsacross_regions_all_horizons.png)
 
 ### DSS
+
+![](results/plots/dss_violin_across_regions_.png)
 
 ![median DSS across
 time](results/plots/dss_median_across_regions_all_horizons.png)
@@ -434,3 +440,59 @@ forecasts](results/plots/sharpness_across_regions_21_day_ahead_forecasts.png)
 ### united-states
 
 ![](results/plots/tests/pred_1_united-states_vs_scores.png)
+
+### pred\_21\_australia
+
+![](results/plots/tests/pred_21_australia_vs_scores.png)
+
+### pred\_21\_china
+
+![](results/plots/tests/pred_21_china_vs_scores.png)
+
+### pred\_21\_china-excluding-hubei
+
+![](results/plots/tests/pred_21_china-excluding-hubei_vs_scores.png)
+
+### pred\_21\_france
+
+![](results/plots/tests/pred_21_france_vs_scores.png)
+
+### pred\_21\_hong-kong
+
+![](results/plots/tests/pred_21_hong-kong_vs_scores.png)
+
+### pred\_21\_hubei
+
+![](results/plots/tests/pred_21_hubei_vs_scores.png)
+
+### pred\_21\_iran
+
+![](results/plots/tests/pred_21_iran_vs_scores.png)
+
+### pred\_21\_italy
+
+![](results/plots/tests/pred_21_italy_vs_scores.png)
+
+### pred\_21\_japan
+
+![](results/plots/tests/pred_21_japan_vs_scores.png)
+
+### pred\_21\_netherlands
+
+![](results/plots/tests/pred_21_netherlands_vs_scores.png)
+
+### pred\_21\_singapore
+
+![](results/plots/tests/pred_21_singapore_vs_scores.png)
+
+### pred\_21\_south-korea
+
+![](results/plots/tests/pred_21_south-korea_vs_scores.png)
+
+### pred\_21\_spain
+
+![](results/plots/tests/pred_21_spain_vs_scores.png)
+
+### pred\_21\_united-states
+
+![](results/plots/tests/pred_21_united-states_vs_scores.png)
